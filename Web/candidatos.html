@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Enviar candidatos</title>
+  </head>
+  <body>
+    <h1>Enviar candidatos</h1>
+    <form id="candidates-form">
+      <label for="candidate1">Candidato 1:</label>
+      <input type="text" id="candidate1" name="candidate1"><br>
+      <label for="candidate2">Candidato 2:</label>
+      <input type="text" id="candidate2" name="candidate2"><br>
+      <input type="submit" value="Enviar">
+      <input type="button" value="Cerrar fase de creación" id="close-creation-phase">
+    </form>
+    <div id="result"></div>
+    <script>
+      const form = document.getElementById('candidates-form');
+      const result = document.getElementById('result');
+      const closeCreationPhaseButton = document.getElementById('close-creation-phase');
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const candidate1 = form.elements.candidate1.value;
+        const candidate2 = form.elements.candidate2.value;
+        const data = { candidate1, candidate2 };
+        try {
+          const response = await fetch('/votaciones/candidates', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+          });
+          const message = await response.text();
+          result.innerText = message;
+        } catch (error) {
+          console.error(error);
+          result.innerText = 'Error al enviar los candidatos';
+        }
+      });
+
+      closeCreationPhaseButton.addEventListener('click', async () => {
+        try {
+          const response = await fetch('/votaciones/close-creation-phase', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+          const message = await response.text();
+          result.innerText = message;
+        } catch (error) {
+          console.error(error);
+          result.innerText = 'Error al cerrar la fase de creación de candidatos';
+        }
+      });
+    </script>
+  </body>
+</html>

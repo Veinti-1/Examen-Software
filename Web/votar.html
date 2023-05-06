@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Votaciones</title>
+  </head>
+  <body>
+    <h1>Votaciones</h1>
+    <form id="vote-form">
+      <label for="vote">Candidato:</label>
+      <input type="text" id="candidate_name" name="vote1"><br>
+      <label for="vote2">Id Votante:</label>
+      <input type="text" id="voter_id" name="vote2"><br>
+      <input type="submit" value="Votar">
+    </form>
+    <div id="result"></div>
+    <button id="close-voting-phase-btn">Cerrar fase de votación</button>
+    <script>
+      const voteForm = document.getElementById('vote-form');
+      const result = document.getElementById('result');
+      const closeVotingBtn = document.getElementById('close-voting-phase-btn');
+
+      voteForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const vote1 = voteForm.elements.vote1.value;
+        const vote2 = voteForm.elements.vote2.value;
+        const data = { vote1, vote2 };
+        try {
+          const response = await fetch('/votaciones/votes', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+          });
+          const message = await response.text();
+          result.innerText = message;
+        } catch (error) {
+          console.error(error);
+          result.innerText = 'Error al votar';
+        }
+      });
+
+      closeVotingBtn.addEventListener('click', async () => {
+        try {
+          const response = await fetch('/votaciones/close-voting-phase', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+          const message = await response.text();
+          result.innerText = message;
+        } catch (error) {
+          console.error(error);
+          result.innerText = 'Error al cerrar la fase de votación';
+        }
+      });
+    </script>
+  </body>
+</html>
